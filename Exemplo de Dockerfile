@@ -1,0 +1,55 @@
+#:ALPINE:NODE
+FROM node:16-alpine
+LABEL builder="Mário Carvalho"
+LABEL version="2022-12-09"
+LABEL application="Whatsapp API"
+
+
+ENV \
+# ==================================
+# SECURITY CONFIGURATION
+# ==================================
+# app_id
+PUSHER_APP_ID="1344827"\
+# key
+PUSHER_KEY="0eaf277a57da2e14c589"\
+# secret
+PUSHER_SECRET="d3bef30a8dfa4f5ea293"\
+# cluster
+PUSHER_CLUSTER="sa1"\
+# Para testar o webhook acesse o site: https://webhook.site  depois copie o link que foi gerado e cole abaixo ( WEBOOK_BASE_URL )
+# Ou defina o webhook por instancia neste endpoint: http://localhost:8000/v3/docs/#/WebhookController/webhookControllerUpdateWebhookUrl
+WEBOOK_BASE_URL=""\
+WEBOOK_SSL_VERIFY="false"\
+DISABLE_WEBHOOK="false"\
+# Definir nome da conexão no aplicativo .APK  após ler o qrcode!
+BROWSER_CLIENT= "Windows"\
+BROWSER_NAME="Google Chrome"\
+# Alterar as portas padrões para acessear os endpoint  ( Porta padrão http: 8083 )
+# HTTP http://localhost:8000/v3/docs/
+HTTP_PORT=8083\
+# HTTPS https://localhost/v3/docs/      ou      https://localhost:443/v3/docs/
+# Para habilitar a autenticação coloque o arquivo ssl.key dentro desta pasta: ..\api\ssl\ssl.key
+HTTPS_PORT=443
+
+#PROCEDIMENTO DE INSTALAÇÃO
+WORKDIR /home/node/app
+#ADD .env.example /home/node/app/.env
+RUN apk add htop nano wget git unzip zip curl npm
+COPY . /home/node/app
+
+EXPOSE 8083
+RUN npm i ts-node -g
+RUN npm i typescript -g
+RUN npm i typedoc -g
+RUN npm i yarn -g
+RUN npm i pm2 -g
+RUN npm cache clean -f
+RUN npm install -g typescript
+RUN npm install -g ts-node
+RUN npm install
+RUN npm run-script build
+RUN pm2 start npm --name WhatsAPINodeJs -- run "start:prod"
+
+
+# Comando Gerar imagem: docker build -t mario/apicheck:1.4 .
