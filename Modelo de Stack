@@ -1,0 +1,28 @@
+version: '1.4'
+
+services:
+  apicheck2:
+    image: mario/apicheck:1.4
+    container_name: api_check2
+    ports:
+      - 8083:8000
+    restart: always
+    volumes:
+      - api_antiga:/home/node/app/
+    environment:
+      - HTTP_PORT=8000
+      - HTTPS_PORT=443
+      #- VIRTUAL_HOST=apiantiga.carreiradoadvogado.com.br
+      #- LETSENCRYPT_HOST=apiantiga.carreiradoadvogado.com.br
+      #- LETSENCRYPT_EMAIL=mariocarvalhope25@gmail.com
+
+    networks:
+            - public
+
+networks:
+    public:
+      name: public
+
+volumes:
+    api_antiga:
+      name: api_antiga
